@@ -11,6 +11,8 @@ import react.dom.html.ReactHTML.p
 import react.dom.html.ReactHTML.h3
 import react.dom.html.*
 
+import mui.material.Slider
+
 import kotlin.math.*
 
 import csstype.*
@@ -112,14 +114,23 @@ external interface InputNumberProps : Props {
     var predicate: (Int) -> Boolean
     var callback: (Int) -> Unit
     var value: Int
+    var minVal: Int
+    var maxVal: Int
 }
 
 private val InputField = FC<InputNumberProps>("InputField") { props ->
     div {
         css {
+            display = Display.flex
+            flexDirection = FlexDirection.column
+            alignItems = AlignItems.center
+            alignContent = AlignContent.center
             borderRadius = 25.px
             backgroundColor = NamedColor.white
-            padding = 5.px
+            padding = 20.px
+            paddingTop = 10.px
+            paddingBottom = 10.px
+            width = 100.px
             display = Display.inlineBlock
             boxShadow = BoxShadow(0.px, 0.px, 10.px, 5.px, Color("#dadada"))
         }
@@ -127,11 +138,13 @@ private val InputField = FC<InputNumberProps>("InputField") { props ->
         input {
             css {
                 position = Position.relative
-                width = 70.px
                 fontSize = 22.px
+                textAlign = TextAlign.center
                 borderStyle = LineStyle.hidden
                 outline = 0.px
+                width = 80.px
                 alignContent = AlignContent.center
+                alignItems = AlignItems.center
                 background = NamedColor.transparent
             }
             value = props.value.toString()
@@ -143,6 +156,17 @@ private val InputField = FC<InputNumberProps>("InputField") { props ->
                 }
             }
         }
+
+        Slider {
+            value = props.value
+            min = props.minVal
+            max = props.maxVal
+            step = 0.05
+            onChange = { _, value, _ ->
+                props.callback((value as Double).toInt())
+            }
+        }
+
     }
 }
 
@@ -173,6 +197,8 @@ external interface ColorFieldProps : Props {
     var callback: List<(Int) -> Unit>
     var predicates: List<(Int) -> Boolean>
     var properties: List<Int>
+    var minVal: List<Int>
+    var maxVal: List<Int>
 }
 
 private val ColorField = FC<ColorFieldProps> { props ->
@@ -205,7 +231,10 @@ private val ColorField = FC<ColorFieldProps> { props ->
                         predicate = props.predicates[i]
                         callback = props.callback[i]
                         value = props.properties[i]
+                        maxVal = props.maxVal[i]
+                        minVal = props.minVal[i]
                     }
+
                 }
             }
         }
@@ -261,6 +290,8 @@ private val App = FC<Props> { props ->
             )
             predicates = listOf(P100, P100, P100, P100)
             properties = listOf(cnt.cmyk.c, cnt.cmyk.m, cnt.cmyk.y, cnt.cmyk.k)
+            minVal = listOf(0, 0, 0, 0)
+            maxVal = listOf(100, 100, 100, 100)
         }
 
         ColorField {
@@ -276,6 +307,9 @@ private val App = FC<Props> { props ->
             )
             predicates = listOf(P255, P255, P255)
             properties = listOf(cnt.rgb.r, cnt.rgb.g, cnt.rgb.b)
+
+            minVal = listOf(0, 0, 0)
+            maxVal = listOf(255, 255, 255)
         }
 
         ColorField {
@@ -291,6 +325,8 @@ private val App = FC<Props> { props ->
             )
             predicates = listOf(P360, P100, P100)
             properties = listOf(cnt.hsv.h, cnt.hsv.s, cnt.hsv.v)
+            minVal = listOf(0, 0, 0)
+            maxVal = listOf(360, 100, 100)
         }
 
 
